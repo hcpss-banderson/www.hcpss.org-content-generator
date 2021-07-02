@@ -1,0 +1,261 @@
+{% extends "base.html.twig" %}
+{% block content %}
+<section class="landing-header">
+    <div class="landing-header-inner">
+        <h1>Schools</h1>
+        <p>Our online school directory</p>
+    </div>
+</section>
+
+<section class="mm">
+    <h2>School Listings and Contacts</h2>
+    <div class="articlestrip">
+    {% for listing in listings %}
+        <article class="card">
+            <div class="hlights__card--content">
+                <h3 style="font-size: 20px;">
+                    <a href="{{ listing.url }}">{{ listing.name }}</a>
+                </h3>
+                <p>{{ listing.description }}</p>
+            </div>
+        </article>
+    {% endfor %}
+    </div>
+</section>
+
+<section id="direct" style="max-width:1245px;">
+    <p><a href="/schools/enrollment-reports/">View enrollment data →</a></p>
+    <h2 class="visually-hidden">School Directory</h2>
+
+    <div class="sch-card__filter-box" aria-labelledy="card-filter" role="region">
+        <section class="sch-card__filter-box--sch-filters" role="region">
+            <div class="sch-card__categories-container-labels">
+                <fieldset role="radiogroup">
+                    <legend>School Level</legend>
+                    <label for="all-schools">
+                        <input type="radio" name="sch-lvl-filter" id="all-schools" class="label-change" value="*" checked="">
+                        <span>All Schools ({{ schools|length }})</span>
+                    </label>
+                    {% for code, level in levels %}
+                        <label for="{{ code }}">
+                            <input type="radio" name="sch-lvl-filter" id="{{ code }}" class="label-change" value=".sch-card__{{ code }}">
+                            <span>{{ level.name }} ({{ level.count }})</span>
+                        </label>
+                    {% endfor %}
+                </fieldset>
+            </div>
+        </section>
+
+        <section class="contents smtb-mg">
+            <form>
+                <label for="cardsearchinput">Search:</label>
+                <span><i class="fa fa-search" aria-hidden="true"></i></span>
+                <input name="cardsearch" type="search" id="cardsearchinput" placeholder="Search for a school">
+            </form>
+            <div id="sch-container__filter-button">
+                <span class="btn__small--light"> <i class="fa fa-filter" aria-hidden="true"></i> More Filters</span>
+            </div>
+            <div class="result-main" style="font-size: 24px;" id="result-count"></div>
+        </section>
+    </div>
+
+    <!--[if lt IE 9]>
+    <style type="text/css">
+      .sch-card__categories { display:none; }
+    </style>
+    <![endif]-->
+
+    <div class="sch-card__categories">
+        <fieldset role="radiogroup">
+            <legend>Categories:</legend>
+
+            <div class="contents nav-close" id="sch-card__categories--close">
+                <p style="float: right;cursor:pointer;margin-right: 1em;">Close Menu
+                <i class="fa fa-times-circle" aria-hidden="true"></i></p>
+            </div>
+
+            <div class="result-main" id="result-count"></div>
+
+            <section>
+                <span><a href="#" id="clear-labels">Clear filters</a></span>
+            </section>
+
+            {% for scope in ["Maryland", "National"] %}
+                <section aria-labelledby="{{ scope|lower|replace({" ": "-"}) }}-awards" role="region">
+                    <strong id="{{ scope|lower|replace({" ": "-"}) }}-awards">{{ scope }} Awards</strong>
+                    <div class="sch-card__categories-container-labels">
+                        {% for award in awards %}
+                            {% if award.scope == scope %}
+                                <label for="{{ award.name|lower|replace({" ": "-"}) }}">
+                                    <input type="checkbox" name="filter" id="{{ award.name|lower|replace({" ": "-"}) }}" class="label-change" value=".sch-card__{{ award.machine_name }}">
+                                    <span>{{ award.name }}<br></span>
+                                </label>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+
+
+            <section aria-labelledby="academics" role="region">
+                <strong id="academics">Academics</strong>
+                <div class="sch-card__categories-container-labels">
+                    <label for="title-i">
+                        <input type="checkbox" name="filter" id="title-i" class="label-change" value=".sch-card__titlei"> Title I<br>
+                    </label>
+                    <label for="esm">
+                        <input type="checkbox" name="filter" id="esm" class="label-change" value=".sch-card__esm"> Elementary School Model
+                    </label>
+                </div>
+            </section>
+
+            <section aria-labelledby="locations" role="region">
+                <strong id="locations">Location</strong>
+                <div class="sch-card__categories-container-labels">
+                {% for location in locations %}
+                    <label for="{{ location|lower|replace({" ": "_"}) }}">
+                        <input
+                            type="radio"
+                            name="filter"
+                            id="{{ location|lower|replace({" ": "_"}) }}"
+                            class="label-change"
+                            value=".sch-card__{{ location|lower|replace({" ": "_"}) }}">
+                            {{ location }}<br>
+                    </label>
+                {% endfor %}
+                </div>
+            </section>
+        </fieldset>
+    </div>
+
+    <section id="sch-carddata" class="flex-contain-row-wrap">
+    {% for school in schools %}
+        {%
+            set classes = [
+                "sch-card",
+                "sch-card__" ~ school.level,
+                "sch-card__" ~ school.address.city|lower|replace({" ": ""}),
+                school.title_1 ? "sch-card__titlei",
+                "sch-card__" ~ school.level ~ "m",
+            ]
+        %}
+        {% for award in school.achievements %}
+            {% set classes = classes|merge(["sch-card__" ~ award.machine_name]) %}
+        {% endfor %}
+
+        <div class="{{ classes|join(" ") }}">
+            <div
+                class="{{ school.level }}-lazy sch-card__bg-image"
+                data-original="https://www.hcpss.org/f/schools/cards/{{ school.acronym }}-header.jpg"
+                style="display: block; background-image: url(&quot;https://www.hcpss.org/f/schools/cards/{{ school.acronym }}-header.jpg&quot;);"></div>
+
+            <div class="heading__no-reset--center">
+                <img
+                    style="background-color: {{ school.primary_color }}; display: inline;"
+                    class="ec-lazy sch-card__mascot-image"
+                    src="https://www.hcpss.org/f/mrb/mascots/mascot-{{ school.acronym }}-xs.png"
+                    data-original="https://www.hcpss.org/f/mrb/mascots/mascot-{{ school.acronym }}-xs.png"
+                    alt="Logo: {{ school.full_name }} mascot">
+
+                <h2 class="sch-card__name">
+                    {{ school.name }}
+                </h2>
+
+                <p aria-label="phone number {{ school.contact.phone }}" style="font-size:20px;">{{ school.contact.phone }}</p>
+                <p><i class="sch-card__icon fa fa-cloud" style="color:#0063A4;"></i><span class="sch-card__icon-text"><a href="https://{{ school.acronym }}.hcpss.org" target="_blank"> Web Site</a></span></p>
+                <p>{{ school.address.street }}, {{ school.address.city }},&nbsp;MD&nbsp;{{ school.address.postal_code }}</p>
+                <p>Principal - {{ school.principal }}</p>
+                {% if school.hours.open %}<p>{{ school.hours.open }} - {{ school.hours.close }}</p>{% endif %}
+
+                <a
+                    onclick="scrollLoad()"
+                    class="btn__small sch-card__modal--toggle"
+                    data-popup-open="{{ school.acronym }}"
+                    tabindex="0"
+                    href="#">View School Details</a>
+            </div>
+
+            <section class="sch-card__modal" data-popup="{{ school.acronym }}">
+                <div class="sch-card__modal--close-area" data-popup-close="{{ school.acronym }}"></div>
+                <div class="sch-card__modal--overlay">
+                    <span class="sch-card__modal--overlay-inner">
+                        <h2>{{ school.name }}</h2>
+                        <section class="contents">
+                            <div class="col-left">
+                                <p><strong>Address:</strong> {{ school.address.street }},
+                                {{ school.address.city }},&nbsp;MD&nbsp;{{ school.address.postal_code }}</p>
+                                <p><strong>Phone:</strong> {{ school.contact.phone }}</p>
+                                <p><strong>Fax:</strong> {{ school.contact.fax }}</p>
+                                <p><strong>Data</strong></p>
+
+                                <div class="sch-card__data">
+                                    <i class="sch-card__icon fa fa-graduation-cap fa-2"></i>
+                                    <span class="sch-card__icon-text"><a href="{{ school.profile }}">
+                                    School Profile</a></span>
+                                </div>
+
+                                <div class="sch-card__data">
+                                    <i class="sch-card__icon fa fa-line-chart fa-2"></i>
+                                    <span class="sch-card__icon-text"><a href="{{ school.msde_report }}">
+                                    MSDE Performance Report</a></span>
+                                </div>
+
+                                <div class="sch-card__data">
+                                    <i class="sch-card__icon fa fa-map-o fa-2"></i>
+                                    <span class="sch-card__icon-text">
+                                    {% if school.walk_area %}
+                                        <div class="sch-card__data">
+                                            <i class="sch-card__icon fa fa-map-o fa-2"></i>
+                                            <span class="sch-card__icon-text"><a href="{{ school.walk_area }}">
+                                            Walk Area Map</a></span>
+                                        </div>
+                                    {% else %}All Students Transported{% endif %}
+                                    </span>
+                                </div>
+
+                                {% if school.achievements|length %}
+                                    <p><strong>Achievements</strong></p>
+                                    {% for achievement in school.achievements %}
+                                        <div class="sch-card__data">
+                                            <i class="sch-card__icon fa fa-{{ achievement.icon.fa }} fa-2" style="color:{{ achievement.icon.color }};"></i>
+                                            <span class="sch-card__icon-text">
+                                            {% if achievement.url is defined %}
+                                                <a href="{{ achievement.url }}" target="_blank">
+                                            {% endif %}
+                                                {{ achievement.name }}
+                                            {% if achievement.url is defined %}
+                                                </a>
+                                                {% if achievement.years %}
+                                                    - {{ achievement.years|join(', ') }}
+                                                {% endif %}
+                                            {% endif %}
+                                            </span>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-right">
+                                <p><strong><a href="https://www.google.com/maps/place/?q=place_id:{{ school.address.google_maps_place_id }}" target="_blank">Get Directions</a></strong></p>
+
+                                <img
+                                    class="sch-card__modal--overlay-map sch-card__modal--overlay-map-lazy"
+                                    data-original="https://www.hcpss.org/f/mrb/google-maps/{{ school.acronym }}-school-locate.jpg"
+                                    alt="Map image: {{ school.full_name }} location">
+                            </div>
+                        </section>
+                    </span>
+                    <p>
+                        <a
+                            class="sch-card__modal--close-btn"
+                            href="#"
+                            data-popup-close="{{ school.acronym }}">Close
+                            <i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                    </p>
+                </div>
+            </section>
+        </div>
+    {% endfor %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+version: '2'
+services:
+  app:
+    container_name: content_generator
+    build: .
+    image: banderson/hcpss-content-content-generator
+    volumes:
+      - ./symfony:/var/www/symfony
+    command: "tail -f /dev/null"
