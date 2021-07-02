@@ -1,0 +1,39 @@
+{% extends "base.html.twig" %}
+{% block content %}
+<p>Please note that times may need to be adjusted. If that becomes a necessity,
+parents of the affected school will be notified of the new opening and closing
+times.</p>
+
+<ul>
+{% for code, level in levels %}
+    <li><a href="#{{ code }}">{{ level.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% for code, level in levels %}
+    <h2><a name="{{ code }}"></a>{{ level.name }}</h2>
+    {% if level == "hs" %}
+        <p><strong>All High Schools</strong>
+        {{ level.schools[0].hours.open }} - {{ level.schools[0].hours.closed }}</p>
+    {% else %}
+        <div class="contents">
+            <div class="thirds">
+            {% set counter = 0 %}
+            {% for school in level.schools %}
+                {% if school.hours.open %}
+                    {% if level.schools|length > 10 and counter >= level.schools|length / 3 %}
+                        </div><div class="thirds">
+                        {% set counter = 0 %}
+                    {% endif %}
+
+                    <p><strong>{{ school.name }}</strong>
+                    {{ school.hours.open }} - {{ school.hours.close }}</p>
+
+                    {% set counter = counter + 1 %}
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}
