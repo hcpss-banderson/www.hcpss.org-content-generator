@@ -17,32 +17,32 @@ class ContentGenerateCardsCommand extends Command
      * @var string
      */
     protected static $defaultName = 'content:generate:cards';
-    
+
     /**
      * @var string
      */
     protected static $defaultDescription = 'Generate school cards.';
-    
+
     /**
      * @var SchoolApiService
      */
     private $schoolApiService;
-    
+
     /**
      * @var Environment
      */
     private $twig;
-    
+
     public function __construct(SchoolApiService $schoolApiService, Environment $twig)
     {
         $this->schoolApiService = $schoolApiService;
         $this->twig = $twig;
         parent::__construct();
     }
-    
+
     /**
      * Page listing.
-     * 
+     *
      * @return array
      */
     private function listings(): array {
@@ -50,18 +50,18 @@ class ContentGenerateCardsCommand extends Command
             [
                 'name' => 'School Directory',
                 'url' => '#direct',
-                'description' => 'Browse and list all HCPSS schools. Quickly 
-                    access each school\'s phone number, building address, 
+                'description' => 'Browse and list all HCPSS schools. Quickly
+                    access each school\'s phone number, building address,
                     website, school opening and closing times, and school profiles.',
             ],[
                 'name' => 'School Locator',
                 'url' => '/school-locator/',
-                'description' => 'Use our online map application to locate your address within the county, 
+                'description' => 'Use our online map application to locate your address within the county,
                     find your planning polygon number, and view adopted attendance areas.',
             ],[
                 'name' => 'School Transportation',
                 'url' => 'https://www.hcpss.org/schools/transportation/',
-                'description' => 'Find a link to our bus stop locator, and learn more about transportation 
+                'description' => 'Find a link to our bus stop locator, and learn more about transportation
                     safety and emergency closing information.',
             ],[
                 'name' => 'Community Superintendents',
@@ -70,13 +70,13 @@ class ContentGenerateCardsCommand extends Command
             ],[
                 'name' => 'Board Member Cluster Assignments',
                 'url' => 'https://www.boarddocs.com/mabe/hcpssmd/Board.nsf/goto?open&amp;id=84SRLW6E9136',
-                'description' => 'Individual Board members are assigned to specific schools visit, attend 
-                    special events, and become additional points of contact for each school 
+                'description' => 'Individual Board members are assigned to specific schools visit, attend
+                    special events, and become additional points of contact for each school
                     community.',
             ],[
                 'name' => 'School Planning',
                 'url' => '/school-planning/',
-                'description' => 'Get more information about projected student enrollment, school boundary 
+                'description' => 'Get more information about projected student enrollment, school boundary
                     studies, attendance area adjustments, and our annual feasibility study.',
             ],[
                 'name' => 'Emergency Closings',
@@ -89,7 +89,7 @@ class ContentGenerateCardsCommand extends Command
             ],[
                 'name' => 'Use of School Facilities',
                 'url' => '/schools/facilities/',
-                'description' => 'View information and deadlines, and complete an online request for the 
+                'description' => 'View information and deadlines, and complete an online request for the
                     use of one of our facilities.',
             ],
         ];
@@ -105,7 +105,7 @@ class ContentGenerateCardsCommand extends Command
         usort($schools, function ($a, $b) {
             return $a['full_name'] <=> $b['full_name'];
         });
-        
+
         $locations = array_reduce($schools, function ($carry, $item) {
             if (!empty($item['address']['city']) && !in_array($item['address']['city'], $carry)) {
                 $carry[] = $item['address']['city'];
@@ -113,7 +113,7 @@ class ContentGenerateCardsCommand extends Command
             return $carry;
         }, []);
         sort($locations);
-        
+
         $levels = [
             'es' => ['name' => 'Elementary School', 'count' => 0],
             'ms' => ['name' => 'Middle School', 'count' => 0],
@@ -123,9 +123,7 @@ class ContentGenerateCardsCommand extends Command
         foreach ($schools as $school) {
             $levels[$school['level']]['count']++;
         }
-        
-        //$this->addIcons($schools);
-        
+
         echo $this->twig->render('cards.html.twig', [
             'schools' => $schools,
             'locations' => $locations,
