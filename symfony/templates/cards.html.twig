@@ -188,11 +188,13 @@
                                 <p><strong>Fax:</strong> {{ school.contact.fax }}</p>
                                 <p><strong>Data</strong></p>
 
-                                <div class="sch-card__data">
-                                    <i class="sch-card__icon fa fa-graduation-cap fa-2"></i>
-                                    <span class="sch-card__icon-text"><a href="{{ school.profile }}">
-                                    School Profile</a></span>
-                                </div>
+                                {% if school.profile %}
+                                  <div class="sch-card__data">
+                                      <i class="sch-card__icon fa fa-graduation-cap fa-2"></i>
+                                      <span class="sch-card__icon-text"><a href="{{ school.profile }}">
+                                      School Profile</a></span>
+                                  </div>
+                                {% endif %}
 
                                 <div class="sch-card__data">
                                     <i class="sch-card__icon fa fa-line-chart fa-2"></i>
